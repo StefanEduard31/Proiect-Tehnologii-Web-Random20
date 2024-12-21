@@ -1,0 +1,26 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "\"Test\"",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StefanEduard31/Proiect-Tehnologii-Web-Random20.git"
+  },
+  "author": "Random20",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/StefanEduard31/Proiect-Tehnologii-Web-Random20/issues"
+  },
+  "homepage": "https://github.com/StefanEduard31/Proiect-Tehnologii-Web-Random20#readme",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0",
+    "nodemon": "^3.1.9"
+  }
+}
