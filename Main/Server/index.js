@@ -8,7 +8,7 @@ const userRouter = require('./routes/user_route');
 const app = express();
 dotenv.config()
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000; 
 
 app.use(cors({
     origin: 'http://127.0.0.1:5500'
@@ -21,13 +21,13 @@ app.get('/', function (req, res) {
 
 app.use(express.urlencoded({ extended: true })); 
 app.use(express.json());
-app.use("/tasks", taskRouter) 
-app.use("/users", userRouter) 
+app.use("/tasks", taskRouter) // Ruter pentru sarcinii
+app.use("/users", userRouter) // Ruter pentru utilizatori
 
 app.listen(PORT, async () => {
     console.log(`Server running at http://127.0.0.1:${PORT}/`)
     try {
-        await sequelize.authenticate();
+        await sequelize.authenticate(); // Realizarea conexiunii cu baza de date
         console.log('Connection has been established successfully.');
     }catch (error) {
         console.error('Unable to connect to the database:', error);
