@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const sequelize = require('./database/sequelize');
 const taskRouter = require('./routes/task_route');
+const userRouter = require('./routes/user_route');
 const app = express();
 
 const PORT = 3100;
@@ -19,6 +20,7 @@ app.get('/', function (req, res) {
 app.use(express.urlencoded({ extended: true })); 
 app.use(express.json());
 app.use("/tasks", taskRouter) 
+app.use("/users", userRouter) 
 
 app.listen(PORT, async () => {
     console.log(`Server running at http://127.0.0.1:${PORT}/`)
