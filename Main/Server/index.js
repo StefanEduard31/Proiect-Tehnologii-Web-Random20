@@ -1,12 +1,14 @@
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+const dotenv = require('dotenv');
 const sequelize = require('./database/sequelize');
 const taskRouter = require('./routes/task_route');
 const userRouter = require('./routes/user_route');
 const app = express();
+dotenv.config()
 
-const PORT = 3100;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors({
     origin: 'http://127.0.0.1:5500'

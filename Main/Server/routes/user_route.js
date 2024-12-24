@@ -1,7 +1,10 @@
 const { Router } = require("express");
+const bcrypt = require('bcrypt');
 const User = require("../database/models/user_model");
 const userRouter = require("express").Router();
 const {Op} = require("sequelize");
+
+const BCRYPT_SALT = process.env.BCRYPT_SALT;
 
 userRouter.route("/")
 .get(async(req, res) => {
@@ -22,7 +25,9 @@ userRouter.route("/")
 })
 .post(async(req, res)=>{
         try{
-            console.log(req.body)
+            const salt = bcrypt.genSaltSync(BCRYPT_SALT);
+            const hash = bcrypt.hashSync(req.body.password, salt);
+            req.body.password = hash;
             const newUser = await User.create(req.body) // CREARE NOU ANGAJAT
             
             return res.status(200).json(newUser)
@@ -54,6 +59,7 @@ userRouter.route("/:id")
         const user = await User.findByPk(req.params.id);
         if(user)
         {
+            req.body.password = user.password;
             const uptdatedUser = await user.update(req.body);
             return res.status(200).json(uptdatedUser)
         }
