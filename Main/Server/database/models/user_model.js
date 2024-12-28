@@ -9,6 +9,10 @@ const User = sequelize.define(
             primaryKey: true,
             autoIncrement: true
         },
+        managerId: {
+            type: DataTypes.INTEGER,
+            allowNull: true
+        },
         username: {
             type: DataTypes.STRING,
             allowNull: false
@@ -38,7 +42,7 @@ const User = sequelize.define(
             values: ['Admin', 'User', 'Manager'],
             validate: {
             isIn: [['Admin', 'User', 'Manager']]},
-            allowNull: false
+            allowNull: true
         },
     }
 )

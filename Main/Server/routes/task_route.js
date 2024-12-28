@@ -24,6 +24,8 @@ taskRouter.route("/")
         try{
             console.log(req.body)
             const newTask = await Task.create(req.body) 
+            newTask.status = "Open"
+            await newTask.save()
             
             return res.status(200).json(newTask)
         }catch(err)

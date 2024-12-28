@@ -8,21 +8,21 @@ const userRouter = require('./routes/user_route');
 const app = express();
 dotenv.config()
 
-const PORT = process.env.PORT || 3000; 
+const PORT = process.env.PORT || 3000;  // Portul pe care ruleaza serverul
 
 app.use(cors({
     origin: 'http://127.0.0.1:5500'
 }));
-app.use(morgan('dev'));
+app.use(morgan('dev')); 
 
 app.get('/', function (req, res) {
     res.send('Hello World')
 })
 
 app.use(express.urlencoded({ extended: true })); 
-app.use(express.json());
-app.use("/tasks", taskRouter) // Ruter pentru sarcinii
+app.use(express.json()); // Middleware pentru a putea folosi JSON
 app.use("/users", userRouter) // Ruter pentru utilizatori
+app.use("/tasks", taskRouter) // Ruter pentru sarcinii
 
 app.listen(PORT, async () => {
     console.log(`Server running at http://127.0.0.1:${PORT}/`)
