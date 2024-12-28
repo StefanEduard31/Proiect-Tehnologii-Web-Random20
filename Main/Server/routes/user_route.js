@@ -32,6 +32,8 @@ userRouter.route("/")
             const hash = bcrypt.hashSync(req.body.password, salt);
             req.body.password = hash; // Cripteaza parola utilizatorului
             const newUser = await User.create(req.body) 
+
+            delete newUser.dataValues.password;
             
             return res.status(200).json(newUser)
         }catch(err)
@@ -62,8 +64,10 @@ userRouter.route("/:id")
         const user = await User.findByPk(req.params.id); // Cautare in functie de cheie primara
         if(user)
         {
-            req.body.password = user.password;
             const uptdatedUser = await user.update(req.body);
+
+            delete uptdatedUser.dataValues.password;
+
             return res.status(200).json(uptdatedUser)
         }
         else

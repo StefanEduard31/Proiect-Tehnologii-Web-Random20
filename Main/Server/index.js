@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const sequelize = require('./database/sequelize');
 const taskRouter = require('./routes/task_route');
 const userRouter = require('./routes/user_route');
+const loginRouter = require('./routes/login_route');
 const app = express();
 dotenv.config()
 
@@ -21,6 +22,7 @@ app.get('/', function (req, res) {
 
 app.use(express.urlencoded({ extended: true })); 
 app.use(express.json()); // Middleware pentru a putea folosi JSON
+app.use("/login", loginRouter) // Ruter pentru utilizatori
 app.use("/users", userRouter) // Ruter pentru utilizatori
 app.use("/tasks", taskRouter) // Ruter pentru sarcinii
 
