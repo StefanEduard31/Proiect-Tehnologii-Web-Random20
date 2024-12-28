@@ -35,4 +35,13 @@ loginRouter.post('/', async (req, res) => {
     }
 })
 
+loginRouter.post('/check', async(req, res) =>{
+    const token = req.body.token;
+
+    if(!token)
+    {
+        return res.status(400).json({success: false, message: 'Token not found'})
+    }
+})
+
 module.exports = loginRouter;

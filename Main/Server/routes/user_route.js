@@ -152,6 +152,170 @@ userRouter.route("/:userId/:taskId/allocate") // Aloca sarcinile utilizatorului 
 
 })   
 
+userRouter.route("/:userId/:taskId/complete") // Marcheaza o sarcina ca fiind completata
+.put(async(req, res) => {
+    try{
+        const user = await User.findByPk(req.params.userId); 
+        if(user)
+        {
+            const task = await Task.findByPk(req.params.taskId); 
+            if(task)
+            {
+                task.status = "Completed";
+                await task.save();
+                return res.status(200).json(task)
+            }
+            else
+            {
+                return res.status(200).json("no data found")    
+            }
+        }
+        else
+        {
+            return res.status(200).json("no data found")
+        }
+    }
+    catch(err)
+    {
+        return res.status(400).json(err)
+    }
+
+})   
+
+userRouter.route("/:userId/:taskId/close") // Marcheaza o sarcina ca fiind inchisa
+.put(async(req, res) => {
+    try{
+        const user = await User.findByPk(req.params.userId); 
+        if(user)
+        {
+            const task = await Task.findByPk(req.params.taskId); 
+            if(task)
+            {
+                task.status = "Closed";
+                await task.save();
+                return res.status(200).json(task)
+            }
+            else
+            {
+                return res.status(200).json("no data found")    
+            }
+        }
+        else
+        {
+            return res.status(200).json("no data found")
+        }
+    }
+    catch(err)
+    {
+        return res.status(400).json(err)
+    }
+
+})   
+
+userRouter.route("/:userId/managedUsers") // Gaseste toti utilizatorii care sunt amanejati de un 
+.get(async(req, res) => { 
+    try{
+        const users = await User.findAll({
+            where: {
+                managerId: req.params.userId
+            }
+        });
+        if(users)
+        {
+            return res.status(200).json(users)
+        }
+        else
+        {
+            return res.status(200).json("no data found")    
+        }
+    }catch(err)
+    {
+        return res.status(400).json(err)
+    }
+})
+
+userRouter.route("/:userId/managedUsersTasks") // Gaseste toate sarcinile utilizatorilor care sunt amanejati de un manager
+.get(async(req, res) => { 
+    try{
+        const users = await User.findAll({
+            where: {
+                managerId: req.params.userId
+            }
+        });
+
+        const tasks = await Task.findAll({
+            where: {
+                userId: {
+                    [Op.in]: users.map(user => user.id)
+                }
+            }
+        });
+        if(users)
+        {
+            return res.status(200).json(users)
+        }
+        else
+        {
+            return res.status(200).json("no data found")    
+        }
+    }catch(err)
+    {
+        return res.status(400).json(err)
+    }
+})
+
+userRouter.route("/:userId/promote") // Promoveaza un utilizator
+.put(async(req, res) => {
+    try{
+        const user = await User.findByPk(req.params.userId); 
+        if(user)
+        {
+            if(user.role === "User")
+                user.role = "Manager";
+            else user.role = "Admin";
+            await user.save();
+            return res.status(200).json(user)
+        }
+        else
+        {
+            return res.status(200).json("no data found")
+        }
+    }
+    catch(err)
+    {
+        return res.status(400).json(err)
+    }
+
+})
+
+userRouter.route("/:userId/demote") // Demoteaza un utilizator
+.put(async(req, res) => {
+    try{
+        const user = await User.findByPk(req.params.userId); 
+        if(user)
+        {
+            if(user.role === "Admin")
+                user.role = "Manager";
+            else if(user.role === "Manager")
+                user.role = "User";
+            else return res.status(200).json("User is already a user");
+            await user.save();
+            return res.status(200).json(user)
+        }
+        else
+        {
+            return res.status(200).json("no data found")
+        }
+    }
+    catch(err)
+    {
+        return res.status(400).json(err)
+    }
+
+})
+
+
+
  
 
 module.exports = userRouter;
