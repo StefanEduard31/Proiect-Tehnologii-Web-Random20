@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const User = require("../database/models/user_model");
 const Task = require("../database/models/task_model");
 const userRouter = require("express").Router();
-const {Op} = require("sequelize");
+const {Op, where} = require("sequelize");
 
 User.hasMany(Task , {foreignKey: 'userId', sourceKey: 'id'});
 
@@ -32,6 +32,22 @@ userRouter.route("/")
             const hash = bcrypt.hashSync(req.body.password, salt);
             req.body.password = hash; // Cripteaza parola utilizatorului
             const newUser = await User.create(req.body) 
+                
+            /*
+            if(newUser.role === "User" && newUser.managerId === null)
+            {
+                managers = await User.findAll({where:{
+                    role: "Manager"
+                }
+                });
+                if(managers.length > 0)
+                {
+                    const rnd = Math.floor(Math.random() * managers.length);
+                    newUser.managerId = managers[rnd].id;
+                    await newUser.save();
+                }
+            }
+            d*/
 
             delete newUser.dataValues.password;
             
@@ -41,6 +57,26 @@ userRouter.route("/")
             return res.status(400).json(err)
         }
 })
+userRouter.route("/unallocatedUsers")
+.get(async(req, res) => { // Gaseste toti utilizatorii care nu sunt asignati unui manager
+    try{
+        const users = await User.findAll({where:{
+            managerId: null
+        }});
+        if(users)
+        {
+            return res.status(200).json(users)
+        }
+        else
+        {
+            return res.status(200).json("no data found")    
+        }
+    }catch(err)
+    {
+        return res.status(400).json(err)
+    }
+})
+
 
 userRouter.route("/:id")
 .get(async(req, res) => { // Gaseste un utilizator in functie de id
@@ -108,6 +144,7 @@ userRouter.route("/:id/assignTask") // Asigneaza o sarcina utilizatorului in fun
         {
             const task = await Task.create(req.body);
             task.userId = user.id;
+            task.status = "Pending";
             await task.save();
             return res.status(200).json(task)
         }
@@ -121,7 +158,7 @@ userRouter.route("/:id/assignTask") // Asigneaza o sarcina utilizatorului in fun
     }
 })
 
-userRouter.route("/:userId/:taskId/allocate") // Aloca sarcinile utilizatorului in functie de id
+userRouter.route("/:userId/:taskId/allocateTask") // Aloca sarcinile utilizatorului in functie de id
 .put(async(req, res) => {
     try{
         const user = await User.findByPk(req.params.userId); 
@@ -152,7 +189,7 @@ userRouter.route("/:userId/:taskId/allocate") // Aloca sarcinile utilizatorului 
 
 })   
 
-userRouter.route("/:userId/:taskId/complete") // Marcheaza o sarcina ca fiind completata
+userRouter.route("/:userId/:taskId/completeTask") // Marcheaza o sarcina ca fiind completata
 .put(async(req, res) => {
     try{
         const user = await User.findByPk(req.params.userId); 
@@ -182,7 +219,7 @@ userRouter.route("/:userId/:taskId/complete") // Marcheaza o sarcina ca fiind co
 
 })   
 
-userRouter.route("/:userId/:taskId/close") // Marcheaza o sarcina ca fiind inchisa
+userRouter.route("/:userId/:taskId/closeTask") // Marcheaza o sarcina ca fiind inchisa
 .put(async(req, res) => {
     try{
         const user = await User.findByPk(req.params.userId); 
@@ -212,7 +249,7 @@ userRouter.route("/:userId/:taskId/close") // Marcheaza o sarcina ca fiind inchi
 
 })   
 
-userRouter.route("/:userId/managedUsers") // Gaseste toti utilizatorii care sunt amanejati de un 
+userRouter.route("/:userId/managedUsers") // Gaseste toti utilizatorii care sunt amanejati de un manager
 .get(async(req, res) => { 
     try{
         const users = await User.findAll({

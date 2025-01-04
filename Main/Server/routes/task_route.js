@@ -33,6 +33,25 @@ taskRouter.route("/")
             return res.status(400).json(err)
         }
 })
+taskRouter.route("/unallocatedTasks") // Returneaza toate sarcinile care nu sunt alocate
+.get(async(req, res) => { 
+    try{
+        const tasks = await Task.findAll({where:{
+            userId: null
+        }});
+        if(tasks)
+        {
+            return res.status(200).json(tasks)
+        }
+        else
+        {
+            return res.status(200).json("no data found")    
+        }
+    }catch(err)
+    {
+        return res.status(400).json(err)
+    }
+})
 
 taskRouter.route("/:id")
 .get(async(req, res) => { // Gaseste o sarcina dupa id
