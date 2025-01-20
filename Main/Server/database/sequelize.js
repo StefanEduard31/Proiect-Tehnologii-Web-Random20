@@ -5,7 +5,7 @@ const sequelize = new Sequelize({
     storage: "./database/taskManagerDatabase.db" // Locul stocarii datelor
 })
 
-sequelize.sync({force: true}).then(() => {
+sequelize.sync({alter: true}).then(() => {
     console.log("Models have been synchronized");
 });
 

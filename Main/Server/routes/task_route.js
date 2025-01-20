@@ -33,6 +33,8 @@ taskRouter.route("/")
             return res.status(400).json(err)
         }
 })
+
+
 taskRouter.route("/unallocatedTasks") // Returneaza toate sarcinile care nu sunt alocate
 .get(async(req, res) => { 
     try{
@@ -76,6 +78,8 @@ taskRouter.route("/:id")
         if(task)
         {
             const updatedTask = await task.update(req.body);
+            updatedTask.status = "Pending"
+            await updatedTask.save();
             return res.status(200).json(updatedTask)
         }
         else
@@ -88,6 +92,54 @@ taskRouter.route("/:id")
     }
 })
 
+taskRouter.route("/assign/:taskId/:userId")
+  .put(async (req, res) => {
+    try {
+        console.log("ceva")
+      const task = await Task.findByPk(req.params.taskId);
+      if (task) {
+        task.userId = req.params.userId;
+        task.status = "Pending";
+        await task.save();
+        return res.status(200).json(task);
+      } else {
+        return res.status(404).json({ error: "Task not found" });
+      }
+    } catch (err) {
+      return res.status(400).json(err);
+    }
+  });
+taskRouter.route("/:id/complete")
+  .put(async (req, res) => {
+    try {
+      const task = await Task.findByPk(req.params.id);
+      if (task) {
+        task.status = "Completed";
+        await task.save();
+        return res.status(200).json(task);
+      } else {
+        return res.status(404).json({ error: "Task not found" });
+      }
+    } catch (err) {
+      return res.status(400).json(err);
+    }
+  });
+
+  taskRouter.route("/:id/close")
+  .put(async (req, res) => {
+    try {
+      const task = await Task.findByPk(req.params.id);
+      if (task) {
+        task.status = "Closed";
+        await task.save();
+        return res.status(200).json(task);
+      } else {
+        return res.status(404).json({ error: "Task not found" });
+      }
+    } catch (err) {
+      return res.status(400).json(err);
+    }
+  });
 
 
 module.exports = taskRouter;

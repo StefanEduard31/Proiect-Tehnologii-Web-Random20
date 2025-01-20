@@ -9,11 +9,10 @@ const loginRouter = require('./routes/login_route');
 const app = express();
 dotenv.config()
 
-const PORT = process.env.PORT || 3000;  // Portul pe care ruleaza serverul
+const PORT = process.env.PORT || 4000;  // Portul pe care ruleaza serverul
 
-app.use(cors({
-    origin: 'http://127.0.0.1:5500'
-}));
+app.use(cors({origin: 'http://localhost:3000'}));
+
 app.use(morgan('dev')); 
 
 app.get('/', function (req, res) {

@@ -28,6 +28,7 @@ userRouter.route("/")
 })
 .post(async(req, res)=>{ // Creaza un nou utilizator cu datele din body
         try{
+            console.log(req.body);
             const salt = bcrypt.genSaltSync(BCRYPT_SALT);
             const hash = bcrypt.hashSync(req.body.password, salt);
             req.body.password = hash; // Cripteaza parola utilizatorului
@@ -62,6 +63,48 @@ userRouter.route("/unallocatedUsers")
     try{
         const users = await User.findAll({where:{
             managerId: null
+        }});
+        if(users)
+        {
+            return res.status(200).json(users)
+        }
+        else
+        {
+            return res.status(200).json("no data found")    
+        }
+    }catch(err)
+    {
+        return res.status(400).json(err)
+    }
+})
+
+userRouter.route("/assign/:managerId/:userId")    
+.put(async(req,res) =>
+{
+    try{
+        const user = await User.findByPk(req.params.userId);
+        if(user)
+        {
+            user.managerId = req.params.managerId;
+            await user.save();
+        }
+        else
+        {
+            return res.status(200).json("no data found")    
+        }
+
+    }catch(err)
+    {
+        return res.status(400).json(err)
+    }
+})
+
+userRouter.route("/assignedUsers/:managerId/")    
+.get(async(req,res) =>
+{
+    try{
+        const users = await User.findAll({where:{
+            managerId: req.params.managerId
         }});
         if(users)
         {
@@ -271,35 +314,35 @@ userRouter.route("/:userId/managedUsers") // Gaseste toti utilizatorii care sunt
     }
 })
 
-userRouter.route("/:userId/managedUsersTasks") // Gaseste toate sarcinile utilizatorilor care sunt amanejati de un manager
-.get(async(req, res) => { 
-    try{
-        const users = await User.findAll({
-            where: {
-                managerId: req.params.userId
-            }
-        });
+userRouter.route("/:managerId/managedTasks")
+  .get(async (req, res) => {
+    try {
+      const { managerId } = req.params;
 
-        const tasks = await Task.findAll({
-            where: {
-                userId: {
-                    [Op.in]: users.map(user => user.id)
-                }
-            }
-        });
-        if(users)
-        {
-            return res.status(200).json(users)
+      // Find all users managed by the specified manager
+      const managedUsers = await User.findAll({
+        where: { managerId }
+      });
+
+      // Extract the IDs of the managed users
+      const managedUserIds = managedUsers.map(user => user.id);
+
+      // Find all tasks assigned to the managed users or with no manager assigned
+      const tasks = await Task.findAll({
+        where: {
+          [Op.or]: [
+            { userId: { [Op.in]: managedUserIds } },
+            { userId: null }
+          ]
         }
-        else
-        {
-            return res.status(200).json("no data found")    
-        }
-    }catch(err)
-    {
-        return res.status(400).json(err)
+      });
+
+      res.status(200).json(tasks);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to fetch managed tasks' });
     }
-})
+  });
 
 userRouter.route("/:userId/promote") // Promoveaza un utilizator
 .put(async(req, res) => {

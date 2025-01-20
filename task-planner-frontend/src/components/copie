@@ -1,0 +1,78 @@
+import React, { useState } from 'react';
+import api from '../services/api'; // Import the Axios instance
+
+function TaskManagement() {
+  const [taskName, setName] = useState(''); // State for task name
+  const [description, setDescription] = useState(''); // State for task description
+  const [deadline, setDeadline] = useState(''); // State for task deadline
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const createTask = async () => {
+    const taskData = { taskName, description, deadline };
+    console.log('Creating task with data:', taskData); // Log the data being sent
+    try {
+      const response = await api.post('/tasks', taskData);
+      setSuccess('Task created successfully');
+      setError('');
+      setName('');
+      setDescription('');
+      setDeadline('');
+    } catch (err) {
+      console.error(err);
+      setError('Failed to create task. Please try again.');
+      setSuccess('');
+    }
+  };
+
+  return (
+    <div style={{ maxWidth: '600px', margin: 'auto', padding: '1rem' }}>
+      <h2>Task Management</h2>
+      <div style={{ marginBottom: '1rem' }}>
+        <h3>Create New Task</h3>
+        <input
+          type="text"
+          placeholder="Task Name"
+          value={taskName}
+          onChange={(e) => setName(e.target.value)}
+          required
+          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+        />
+        <input
+          type="text"
+          placeholder="Task Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+        />
+        <input
+          type="date"
+          placeholder="Task Deadline"
+          value={deadline}
+          onChange={(e) => setDeadline(e.target.value)}
+          required
+          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+        />
+        <button
+          onClick={createTask}
+          style={{
+            width: '100%',
+            padding: '0.5rem',
+            backgroundColor: '#007BFF',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+        >
+          Create Task
+        </button>
+      </div>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {success && <p style={{ color: 'green' }}>{success}</p>}
+    </div>
+  );
+}
+
+export default TaskManagement;
